@@ -1,10 +1,23 @@
 #!/usr/bin/env python3
 import multiprocessing
-import fcntl
-import subprocess, os
+import subprocess
+import os
+import logging
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s %(process)s %(processName)s %(message)s',
+    filename='imageoptimizer_finished.log',
+    filemode='a'
+)
+
+i = multiprocessing.Value('i', 0)
+total = 0
 
 
-def compress(path: str):
+def compress(args: list):
+    global i, total
+    path = args[1]
     directory = os.path.dirname(path)
     file_name = os.path.basename(path)
     new_directory = directory.replace('/data/var/www/', '/data/var/img_processed/')
@@ -12,12 +25,37 @@ def compress(path: str):
         os.makedirs(new_directory)
     new_path = os.path.join(new_directory, file_name)
     command = 'guetzli --quality 84 {0} {1}'.format(path, new_path)
+    # print("Processing image:", path)
     subprocess.run(command, shell=True)
-    return new_path
+    i.value += 1
+    if i.value % 10 is 0:
+        percentage = round(100 * i.value / total, 2)
+        print("{0} of {1} processed; Progress: {2}%".format(i.value, total, percentage))
+    filetime = str(int(os.path.getmtime(new_path)))
+    new_line = '|'.join([args[0], path, filetime])
+    logging.debug(new_line)
+    return new_line
 
 
-imgPath = '/data/var/www/mocka.co.nz/htdocs/media/product/f4/belle-kids-chair-90.jpg'
-print("Got result:", compress(imgPath))
+if __name__ == "__main__":
+    # imgPath = '/data/var/www/mocka.co.nz/htdocs/media/product/f4/belle-kids-chair-90.jpg'
+    # result = str(int(os.path.getmtime(imgPath)))
+    # print(result)
+
+    f = open('apptrian_imageoptimizer_index.data', 'r')  # read mode open the index file
+    path_arguments = list()
+    for line in f.readlines():  # Read all lines one time
+        line = line.strip()  # trim each line's blank
+        if not len(line) or line.startswith('#'):  # Check if the line is empty or being commented
+            continue  # Skip the line if invalid
+
+        line_data = line.split('|')
+        path_arguments.append([line_data[0], line_data[1]])
+
+    total = len(path_arguments)
+    pool = multiprocessing.Pool()
+    # with open('imageoptimizer_finished.data', 'a') as result_file:
+    pool.map(compress, path_arguments)
 
 
 def crawl(result_queue):
@@ -30,7 +68,6 @@ def crawl(result_queue):
         result_queue.put(data)
 
     print("Read site.")
-
 
 # processs = []
 # result_queue = multiprocessing.Queue()
