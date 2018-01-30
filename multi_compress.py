@@ -53,7 +53,7 @@ if __name__ == "__main__":
         path_arguments.append([line_data[0], line_data[1]])
 
     total = len(path_arguments)
-    pool = multiprocessing.Pool()
+    pool = multiprocessing.Pool(32)
     # with open('imageoptimizer_finished.data', 'a') as result_file:
     pool.map(compress, path_arguments)
 
