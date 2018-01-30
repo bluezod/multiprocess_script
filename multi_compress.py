@@ -15,25 +15,34 @@ i = multiprocessing.Value('i', 0)
 total = 0
 
 
-def compress(args: list):
-    global i, total
-    path = args[1]
-    directory = os.path.dirname(path)
-    file_name = os.path.basename(path)
+def __get_new_path(old_path):
+    directory = os.path.dirname(old_path)
+    file_name = os.path.basename(old_path)
     new_directory = directory.replace('/data/var/www/', '/data/var/img_processed/')
     if not os.path.exists(new_directory):
         os.makedirs(new_directory)
-    new_path = os.path.join(new_directory, file_name)
-    command = 'guetzli --quality 84 {0} {1}'.format(path, new_path)
-    # print("Processing image:", path)
-    subprocess.run(command, shell=True)
+    return os.path.join(new_directory, file_name)
+
+
+def compress(args: list):
+    global i, total
     i.value += 1
     if i.value % 10 is 0:
         percentage = round(100 * i.value / total, 2)
         print("{0} of {1} processed; Progress: {2}%".format(i.value, total, percentage))
+
+    path = args[1]
+    new_path = __get_new_path(path)
+    command_called = False
+    if not os.path.isfile(new_path):
+        command = 'guetzli --quality 84 {0} {1}'.format(path, new_path)
+        # print("Processing image:", path)
+        subprocess.run(command, shell=True)
+        command_called = True
     filetime = str(int(os.path.getmtime(new_path)))
     new_line = '|'.join([args[0], path, filetime])
-    logging.debug(new_line)
+    if command_called:
+        logging.debug(new_line)
     return new_line
 
 
