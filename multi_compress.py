@@ -47,9 +47,11 @@ def compress(args: list):
 
 
 if __name__ == "__main__":
-    # imgPath = '/data/var/www/mocka.co.nz/htdocs/media/product/f4/belle-kids-chair-90.jpg'
-    # result = str(int(os.path.getmtime(imgPath)))
+    # imgPath = '/data/var/www/mocka.com.au/htdocs/media/product/1f/brooklyn-single-bed-76.jpg'
+    # p_args = ['TESTING-FILE-KEY', imgPath]
+    # result = compress(p_args)
     # print(result)
+    # exit(0)
 
     f = open('apptrian_imageoptimizer_index.data', 'r')  # read mode open the index file
     path_arguments = list()
@@ -62,7 +64,7 @@ if __name__ == "__main__":
         path_arguments.append([line_data[0], line_data[1]])
 
     total = len(path_arguments)
-    pool = multiprocessing.Pool(32)
+    pool = multiprocessing.Pool()
     # with open('imageoptimizer_finished.data', 'a') as result_file:
     pool.map(compress, path_arguments)
 
