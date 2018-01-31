@@ -35,7 +35,7 @@ def compress(args: list):
     new_path = __get_new_path(path)
     command_called = False
     if not os.path.isfile(new_path):
-        command = 'guetzli --quality 84 {0} {1}'.format(path, new_path)
+        command = 'guetzli --quality 84 --nomemlimit {0} {1}'.format(path, new_path)
         # print("Processing image:", path)
         subprocess.run(command, shell=True)
         command_called = True
