@@ -32,9 +32,11 @@ def compress(args: list):
         print("{0} of {1} processed; Progress: {2}%".format(i.value, total, percentage))
 
     path = args[1]
+    if os.path.isfile(path):
+        return '|'.join([args[0], path, 'Original file not found'])
     new_path = __get_new_path(path)
     command_called = False
-    if not os.path.isfile(new_path) and os.path.isfile(path):
+    if not os.path.isfile(new_path):
         command = 'guetzli --quality 84 --nomemlimit {0} {1}'.format(path, new_path)
         # print("Processing image:", path)
         subprocess.run(command, shell=True)
