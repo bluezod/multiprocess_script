@@ -35,25 +35,25 @@ def compress(args: list):
     if not os.path.isfile(path):
         return '|'.join([args[0], path, 'Original file not found'])
     new_path = __get_new_path(path)
-    command_called = False
-    if not os.path.isfile(new_path):
-        command = 'guetzli --quality 84 --nomemlimit {0} {1}'.format(path, new_path)
-        # print("Processing image:", path)
-        subprocess.run(command, shell=True)
-        command_called = True
+    if os.path.isfile(new_path):
+        return '|'.join([args[0], path, 'The file has already been processed'])
+    command = 'guetzli --quality 84 --nomemlimit {0} {1}'.format(path, new_path)
+    # print("Processing image:", path)
+    processed = subprocess.run(command, shell=True, stderr=subprocess.PIPE)
+    if "Please provide the input image as a PNG file" in processed.stderr.decode("utf-8"):
+        return '|'.join([args[0], path, 'This image is actually a PNG file'])
     filetime = str(int(os.path.getmtime(new_path)))
     new_line = '|'.join([args[0], path, filetime])
-    if command_called:
-        logging.debug(new_line)
+    logging.debug(new_line)
     return new_line
 
 
 if __name__ == "__main__":
-    # imgPath = '/data/var/www/mocka.com.au/htdocs/media/product/1f/brooklyn-single-bed-76.jpg'
-    # p_args = ['TESTING-FILE-KEY', imgPath]
-    # result = compress(p_args)
-    # print(result)
-    # exit(0)
+    imgPath = '/data/var/www/mocka.co.nz/htdocs/media/contact_attachments/1463111059.jpg'
+    p_args = ['TESTING-FILE-KEY', imgPath]
+    result = compress(p_args)
+    print(result)
+    exit(0)
 
     f = open('apptrian_imageoptimizer_index.data', 'r')  # read mode open the index file
     path_arguments = list()
