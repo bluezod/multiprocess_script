@@ -51,11 +51,11 @@ def compress(args: list):
 
 
 if __name__ == "__main__":
-    imgPath = '/data/var/www/mocka.com.au/htdocs/media/contact_attachments/win.ini_00.1504867694.jpg'
-    p_args = ['TESTING-FILE-KEY', imgPath]
-    result = compress(p_args)
-    print(result)
-    exit(0)
+    # imgPath = '/data/var/www/mocka.com.au/htdocs/media/contact_attachments/win.ini_00.1504867694.jpg'
+    # p_args = ['TESTING-FILE-KEY', imgPath]
+    # result = compress(p_args)
+    # print(result)
+    # exit(0)
 
     f = open('apptrian_imageoptimizer_index.data', 'r')  # read mode open the index file
     path_arguments = list()
