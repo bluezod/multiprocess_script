@@ -42,6 +42,8 @@ def compress(args: list):
     processed = subprocess.run(command, shell=True, stderr=subprocess.PIPE)
     if "Please provide the input image as a PNG file" in processed.stderr.decode("utf-8"):
         return '|'.join([args[0], path, 'This image is actually a PNG file'])
+    if "Error reading JPG data from input file" in processed.stderr.decode("utf-8"):
+        return '|'.join([args[0], path, 'Marker byte (0xff) expected found 46; Error reading JPG data from input file'])
     filetime = str(int(os.path.getmtime(new_path)))
     new_line = '|'.join([args[0], path, filetime])
     logging.debug(new_line)
@@ -49,11 +51,11 @@ def compress(args: list):
 
 
 if __name__ == "__main__":
-    # imgPath = '/data/var/www/mocka.co.nz/htdocs/media/contact_attachments/1463111059.jpg'
-    # p_args = ['TESTING-FILE-KEY', imgPath]
-    # result = compress(p_args)
-    # print(result)
-    # exit(0)
+    imgPath = '/data/var/www/mocka.com.au/htdocs/media/contact_attachments/win.ini_00.1504867694.jpg'
+    p_args = ['TESTING-FILE-KEY', imgPath]
+    result = compress(p_args)
+    print(result)
+    exit(0)
 
     f = open('apptrian_imageoptimizer_index.data', 'r')  # read mode open the index file
     path_arguments = list()
